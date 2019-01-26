@@ -6,7 +6,7 @@ import pandas as pd
 
 def chrome_browser():
     executable_path = {"executable_path": "chromedriver"}
-    return Browser("chrome", **executable_path, headless=False)
+    return Browser("chrome", **executable_path, headless=True)
 
 # Start with a function called `scrape` 
 # that will execute all of your scraping code and return one Python dictionary containing all of the scraped data.
@@ -95,28 +95,42 @@ def scrape():
 
     hemisphere_image_urls=[]
 
-    for mars_hemi in mars_hemis:
-   
-        browser.visit(url5)
+    try:
 
-        browser.click_link_by_partial_text(mars_hemi)
-        
-        html = browser.html
-        soup = bs(html, "html.parser")
-        
-        picdwnload = soup.find('div',class_="downloads" )
-        
-        hemi_url =picdwnload.find('li').a["href"]
-        
+        for mars_hemi in mars_hemis:
+    
+            browser.visit(url5)
+
+            browser.click_link_by_partial_text(mars_hemi)
+            
+            html = browser.html
+            soup = bs(html, "html.parser")
+            
+            picdwnload = soup.find('div',class_="downloads" )
+            
+            hemi_url =picdwnload.find('li').a["href"]
+            
+            hemi_dict={}
+            
+            hemi_dict["title"]=mars_hemi
+            
+            hemi_dict["img_url"]=hemi_url
+            
+            hemisphere_image_urls.append(hemi_dict)
+
+        MarsDict["Mars_Hemispheres"]=hemisphere_image_urls 
+    except AttributeError:
+
+        # Image error returns None for better front-end handling
+        picdwnload = None
+        hemi_url = None
+
         hemi_dict={}
-        
-        hemi_dict["title"]=mars_hemi
-        
+            
+        hemi_dict["title"]=picdwnload
+            
         hemi_dict["img_url"]=hemi_url
-        
         hemisphere_image_urls.append(hemi_dict)
-
-    MarsDict["Mars_Hemispheres"]=hemisphere_image_urls 
 
     return MarsDict
 
